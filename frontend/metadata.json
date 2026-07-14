@@ -1,0 +1,6 @@
+{
+  "name": "ChurnSense AI",
+  "description": "Customer Churn Analysis & Prediction System",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
