@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useChurn } from '../context/ChurnContext';
 import { useTheme } from '../context/ThemeContext';
 import { Search, Filter, Trash2, Eye, RefreshCw, Calendar, FileText, CheckCircle } from 'lucide-react';
-import { HistoryRecord } from '../types';
+import { CustomerAssessmentData, HistoryRecord } from '../types';
 
 export default function CustomerHistory() {
   const { history, deleteHistoryRecord, clearHistory, updateForm, runPredictionEngine } = useChurn();
@@ -36,9 +36,9 @@ export default function CustomerHistory() {
   const borderClass = theme === 'dark' ? 'border-slate-800/60' : 'border-slate-200';
 
   // Handle reload of previous report instance
-  const handleViewReport = (item: HistoryRecord) => {
+  const handleViewReport = async (item: HistoryRecord) => {
     // Inject parameters back into active form context state
-    updateForm({
+    const recoveredData: CustomerAssessmentData = {
       gender: item.gender as any,
       maritalStatus: 'Married', // default mock recovery
       cityTier: item.cityTier as any,
@@ -57,11 +57,14 @@ export default function CustomerHistory() {
       warehouseToHome: 15,
       customerSatisfaction: item.satisfaction,
       complaint: item.complaint,
-    });
-    // Trigger analysis calculation
-    runPredictionEngine(item.customerName);
-    // Route to prediction results
-    navigate('/app/result');
+    };
+    updateForm(recoveredData);
+    try {
+      await runPredictionEngine(item.customerName, recoveredData);
+      navigate('/app/result');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const filteredHistory = history.filter((item) => {

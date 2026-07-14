@@ -64,17 +64,19 @@ export default function CustomerAssessment() {
     setStep((prev) => Math.max(1, prev - 1));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName.trim()) {
       setValidationError("Client name is required.");
       return;
     }
     setValidationError("");
-    // Run prediction calculations
-    runPredictionEngine(customerName);
-    // Redirect to processing animation view
-    navigate('/app/processing');
+    try {
+      await runPredictionEngine(customerName);
+      navigate('/app/processing');
+    } catch (error) {
+      setValidationError(error instanceof Error ? error.message : "Unable to run churn prediction.");
+    }
   };
 
   const stepsMeta = [
